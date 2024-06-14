@@ -1,0 +1,13 @@
+#specifiees the version of docker compose file format
+version: '3.7'
+
+#defines the services-containers that make up the application
+services:
+  webservice:
+    image: spring-boot-app:latest
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+
+    ports:
+      - "${TEST_WEBSERVICE_PORT:-8080}:8080"
+
