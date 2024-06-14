@@ -40,9 +40,3 @@ This project is a basic Java REST webservice using Spring Boot, created to learn
 6. or by calling the bash script (call-test-rest.sh)
     - ensure the script is executable: chmod +x call-test-rest.sh
     - run the script bash call-test-rest.sh
-
-
-
-8. 
-
-
