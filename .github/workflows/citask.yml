@@ -35,7 +35,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          tags: my app:latest
+          tags: spring-boot-app:latest
           push: false
 
       - name: Run Trivy Vulnerability Scanner

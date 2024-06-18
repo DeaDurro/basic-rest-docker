@@ -4,7 +4,7 @@ version: '3.7'
 services:
   webservice:
     #since no CI we could use only build instead of:
-    #image: spring-boot-app:latest
+    image: spring-boot-app:latest
     build: .
     environment:
       - SPRING_PROFILES_ACTIVE=prod
