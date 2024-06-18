@@ -12,10 +12,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 public class BasicRestAndDockerApplication {
 
-    public BasicRestAndDockerApplication() {
-        // private constructor to prevent instantiation
-    }
-
     /**
      * Main method.
      * @param args Command line arguments.
