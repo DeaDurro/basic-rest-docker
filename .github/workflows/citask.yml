@@ -64,7 +64,7 @@ jobs:
           java-version: 22
 
       - name: Run check style
-        uses: mvn checkstyle:check
+        run: mvn checkstyle:check
 
 
   Integration-tests:
