@@ -12,6 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/helloworld")
 public final class HelloWorldController {
+    /**
+     * Returns a HelloWorld object.
+     *
+     * @return a HelloWorld object with id and message.
+     */
 
     @GetMapping
     public HelloWorld getHelloWorld() {

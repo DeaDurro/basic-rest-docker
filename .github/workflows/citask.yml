@@ -86,7 +86,7 @@ jobs:
         run: sleep 30
 
       - name: Call HelloWorld Endpoint
-        run: curl -s http://localhost:8085/helloworld | grep 'Hello World'
+        run: curl -s http://localhost:${{ env.TEST_WEBSERVICE_PORT }}/helloworld | grep 'Hello World'
 
   push-docker-image:
     needs: security-scan
