@@ -13,12 +13,13 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Set up JDK 22
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 22
+          java-version: 17
           cache: maven
+
       - name: Build with Maven
         run: mvn --batch-mode --update-snapshots verify
 
@@ -29,13 +30,13 @@ jobs:
           queries: security-and-quality
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/analyze@v3
 
       - name: Build docker image
         uses: docker/build-push-action@v5
         with:
           context: .
-          tags: spring-boot-app:latest
+          tags: security-scan-build:latest
           push: false
 
       - name: Run Trivy Vulnerability Scanner
@@ -57,27 +58,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up JDK 22
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 22
+          java-version: 17
 
       - name: Run check style
         run: mvn checkstyle:check
 
-
-  Integration-tests:
+  integration-tests:
     needs: security-scan
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up JDK 22
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 22
+          java-version: 17
 
       - name: Start Application
         run: mvn spring-boot:run &
@@ -88,24 +88,23 @@ jobs:
       - name: Call HelloWorld Endpoint
         run: curl -s http://localhost:8085/helloworld | grep 'Hello World'
 
-
   push-docker-image:
-        needs: security-scan
-        runs-on: ubuntu-latest
-        steps:
-          - name: Checkout code
-            uses: actions/checkout@v4
+    needs: security-scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-          - name: Login to GitHub Container Registry
-            uses: docker/login-action@v2
-            with:
-              registry: ghcr.io
-              username: ${{ github.actor }}
-              password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-          - name: Build Docker Image
-            uses: docker/build-push-action@v5
-            with:
-              context: .
-              tags: ghcr.io/${{ github.repository }}:latest
-              push: true
+      - name: Build Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          tags: ghcr.io/${{ github.repository }}:latest
+          push: true

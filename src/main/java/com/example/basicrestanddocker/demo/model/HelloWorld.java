@@ -1,22 +1,26 @@
+/**
+ * This package contains the main application classes.
+ */
+
 package com.example.basicrestanddocker.demo.model;
 
 
 public class HelloWorld {
-    private int Id;
+    private int id;
     private String helloworld;
 
 
     public HelloWorld(int id, String helloworld) {
-        this.Id = id;
+        this.id = id;
         this.helloworld = helloworld;
     }
 
     public int getId() {
-        return Id;
+        return id;
     }
 
     public void setId(int id) {
-        this.Id = id;
+        this.id = id;
     }
     public String getHelloworld() {
         return helloworld;

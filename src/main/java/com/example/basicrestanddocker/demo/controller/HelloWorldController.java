@@ -1,3 +1,7 @@
+/**
+ * This package contains the main application classes.
+ */
+
 package com.example.basicrestanddocker.demo.controller;
 
 import com.example.basicrestanddocker.demo.model.HelloWorld;
@@ -7,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/helloworld")
-public class HelloWorldController {
+public final class HelloWorldController {
 
     @GetMapping
     public HelloWorld getHelloWorld() {
