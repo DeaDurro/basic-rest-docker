@@ -20,9 +20,6 @@ jobs:
           java-version: 17
           cache: maven
 
-      - name: Build with Maven
-        run: mvn --batch-mode --update-snapshots verify
-
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
@@ -32,17 +29,10 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
 
-      - name: Build docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          tags: security-scan-build:latest
-          push: false
-
       - name: Run Trivy Vulnerability Scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: security-scan-build:latest
+          image-ref: spring-boot-app:latest
           format: sarif
           output: trivy-results.sarif
           severity: 'CRITICAL,HIGH'
@@ -70,6 +60,11 @@ jobs:
   integration-tests:
     needs: security-scan
     runs-on: ubuntu-latest
+    services:
+      web:
+        image: spring-boot-app:latest
+        ports:
+          - 8085:8080
     steps:
       - uses: actions/checkout@v4
 
@@ -79,17 +74,21 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - name: Start Application
-        run: mvn spring-boot:run &
-
-      - name: Wait for Spring Boot Application to Start
-        run: sleep 30
+      - name: Wait for service to be healthy
+        run: |
+          for i in {1..10}; do
+            if curl --fail http://localhost:8085/actuator/health; then
+              exit 0
+            fi
+            sleep 5
+          done
+          exit 1
 
       - name: Call HelloWorld Endpoint
-        run: curl -s http://localhost:${{ env.TEST_WEBSERVICE_PORT }}/helloworld | grep 'Hello World'
+        run: curl -s http://localhost:8085/helloworld | grep 'Hello World'
 
   push-docker-image:
-    needs: security-scan
+    needs: [security-scan, integration-tests]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
