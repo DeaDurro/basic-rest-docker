@@ -23,7 +23,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.m2/repository
-          key: tests-maven-${{ hashFiles('pom.xml') }}
+          key: security-scan-maven-${{ hashFiles('pom.xml') }}
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
