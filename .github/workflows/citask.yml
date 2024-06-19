@@ -89,7 +89,7 @@ jobs:
         run: |
           response=$(curl -s http://localhost:8080/helloworld)
           echo "Response: $response"
-          if [[ "$response" != '{"id":1,"helloWorld":"Hello World"}' ]]; then
+          if [[ "$response" != '{"id":1,"helloworld":"Hello World"}' ]]; then
             echo "Integration test failed"
             exit 1
           fi
