@@ -43,6 +43,16 @@ jobs:
       - name: Build Docker image
         run: docker build -t helloworld-service .
 
+      - name: Save Docker image as tar file
+        run: docker save -o helloworld-service.tar helloworld-service
+
+      - name: Upload Docker image tar file
+        uses: actions/upload-artifact@v4
+        with:
+          name: helloworld-service-tar
+          path: helloworld-service.tar
+
+
       - name: Run Trivy Vulnerability Scanner
         uses: aquasecurity/trivy-action@master
         with:
@@ -83,7 +93,7 @@ jobs:
           - 8085:8080
 
     steps:
-      - name: Checkout code
+      - name: Checkout git repository
         uses: actions/checkout@v4
 
       - name: Set up Docker
@@ -126,8 +136,17 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker image
+      - name: Download Docker image tar file
+        uses: actions/download-artifact@v4
+        with:
+          name: helloworld-service-tar
+          path: helloworld-service.tar
+
+      - name: Load Docker image from tar file
+        run: docker load --input helloworld-service.tar
+
+      - name: push Docker image to GitHub Container Registry
         run: |
           REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-          docker build -t ghcr.io/${REPO_NAME}/helloworld-service:latest .
+          docker tag helloworld-service:latest ghcr.io/${REPO_NAME}/helloworld-service:latest
           docker push ghcr.io/${REPO_NAME}/helloworld-service:latest
