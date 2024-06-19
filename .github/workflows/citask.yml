@@ -40,18 +40,17 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and Export to Docker
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          tags: helloworld-service:latest
-          outputs: type=docker,dest=/tmp/helloworld-service.tar
+      - name: Build Docker image
+        run: docker build -t helloworld-service .
 
-      - name: Upload Docker Image
+      - name: Save Docker image as tar file
+        run: docker save -o helloworld-service.tar helloworld-service
+
+      - name: Upload Docker image tar file
         uses: actions/upload-artifact@v4
         with:
           name: helloworld-service-tar
-          path: /tmp/helloworld-service.tar
+          path: helloworld-service.tar
 
 
       - name: Run Trivy Vulnerability Scanner
@@ -100,12 +99,11 @@ jobs:
       -  name: Download Docker image tar file
          uses: actions/download-artifact@v4
          with:
-          name: helloworld-service-tar
-          path: /tmp/helloworld-service.tar
+           name: helloworld-service-tar
+           path: .
 
       - name: Load Docker image from tar file
-        run: docker load --input /tmp/helloworld-service.tar
-
+        run: docker load --input helloworld-service.tar
 
       - name: Run Docker container
         run: docker run -d -p 8080:8080 helloworld-service
@@ -119,13 +117,13 @@ jobs:
 
       - name: Test the service
         run: ./call-test-rest.sh http://localhost:8085/helloworld
-        #|
+          #|
           #response=$(curl -s http://localhost:8080/helloworld)
           #echo "Response: $response"
           #if [[ "$response" != '{"id":1,"helloworld":"Hello World"}' ]]; then
-            #echo "Integration test failed"
-            #exit 1
-          #fi
+          #echo "Integration test failed"
+          #exit 1
+        #fi
 
   push_docker:
     needs: integration_test
@@ -146,11 +144,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: helloworld-service-tar
-          path: /tmp/helloworld-service.tar
+          path: /tmp
 
       - name: Load Docker image from tar file
         run: docker load --input /tmp/helloworld-service.tar
-
 
       - name: push Docker image to GitHub Container Registry
         run: |
