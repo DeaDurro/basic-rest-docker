@@ -96,32 +96,36 @@ jobs:
       - name: Checkout git repository
         uses: actions/checkout@v4
 
-      - name: Set up Docker
-        uses: docker/setup-buildx-action@v3
+      -  name: Download Docker image tar file
+         uses: actions/download-artifact@v4
+         with:
+          name: helloworld-service-tar
+          path: .
 
-      - name: Build Docker image
-        run: docker build -t helloworld-service .
+      - name: Load Docker image from tar file
+        run: docker load --input helloworld-service.tar
 
       - name: Run Docker container
         run: docker run -d -p 8080:8080 helloworld-service
 
       - name: Wait for service to be available
-        run: |
+        run:  |
           until curl -s http://localhost:8080/helloworld; do
             echo "Waiting for service to be available..."
             sleep 5
           done
 
       - name: Test the service
-        run: |
-          response=$(curl -s http://localhost:8080/helloworld)
-          echo "Response: $response"
-          if [[ "$response" != '{"id":1,"helloworld":"Hello World"}' ]]; then
-            echo "Integration test failed"
-            exit 1
-          fi
+        run: ./call-test-rest.sh http://localhost:8085/helloworld
+        #|
+          #response=$(curl -s http://localhost:8080/helloworld)
+          #echo "Response: $response"
+          #if [[ "$response" != '{"id":1,"helloworld":"Hello World"}' ]]; then
+            #echo "Integration test failed"
+            #exit 1
+          #fi
 
-  build_and_push:
+  push_docker:
     needs: integration_test
     runs-on: ubuntu-latest
 
