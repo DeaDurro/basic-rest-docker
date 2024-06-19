@@ -143,7 +143,7 @@ jobs:
       - name: Download Docker image tar file
         uses: actions/download-artifact@v4
         with:
-          name: helloworld-service
+          name: helloworld-service-tar
           path: /tmp
 
       - name: Load Docker image from tar file
