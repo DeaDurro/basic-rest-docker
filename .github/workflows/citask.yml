@@ -40,17 +40,18 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v3
 
-      - name: Build Docker image
-        run: docker build -t helloworld-service .
+      - name: Build and Export to Docker
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          tags: helloworld-service:latest
+          outputs: type=docker,dest=/tmp/helloworld-service.tar
 
-      - name: Save Docker image as tar file
-        run: docker save -o helloworld-service.tar helloworld-service
-
-      - name: Upload Docker image tar file
+      - name: Upload Docker Image
         uses: actions/upload-artifact@v4
         with:
           name: helloworld-service-tar
-          path: helloworld-service.tar
+          path: /tmp/helloworld-service.tar
 
 
       - name: Run Trivy Vulnerability Scanner
@@ -100,10 +101,11 @@ jobs:
          uses: actions/download-artifact@v4
          with:
           name: helloworld-service-tar
-          path: .
+          path: /tmp/helloworld-service.tar
 
       - name: Load Docker image from tar file
-        run: docker load --input helloworld-service.tar
+        run: docker load --input /tmp/helloworld-service.tar
+
 
       - name: Run Docker container
         run: docker run -d -p 8080:8080 helloworld-service
@@ -144,10 +146,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: helloworld-service-tar
-          path: /tmp
+          path: /tmp/helloworld-service.tar
 
       - name: Load Docker image from tar file
         run: docker load --input /tmp/helloworld-service.tar
+
 
       - name: push Docker image to GitHub Container Registry
         run: |
