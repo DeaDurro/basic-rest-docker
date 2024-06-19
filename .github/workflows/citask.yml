@@ -19,12 +19,17 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: OWASP Dependency-Check
-        uses: dependency-check/scan-action@v1.5.0
+      - name: Cache Local Maven Repository
+        uses: actions/cache@v4
         with:
-          fail_threshold: 11.0
-          format: 'ALL'
-          owasp_report: true
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-m2-
+
+      - name: Run OWASP Dependency-Check
+        run: mvn verify org.owasp:dependency-check-maven:check
+
 
   linter:
     runs-on: ubuntu-latest
